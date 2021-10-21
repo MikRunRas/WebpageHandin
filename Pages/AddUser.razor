@@ -1,0 +1,61 @@
+﻿@page "/AddUser"
+@using Models
+@using WebApplication.Data
+@using LoginExample.Data.Impl
+
+@inject IUserData UserData
+@inject NavigationManager NavigationManager
+
+<h3>Add User</h3>
+
+<EditForm Model="@newUserItem" OnValidSubmit="@AddNewUser">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <tr>
+        <td class="form-group"> Username: <br/>
+            <InputText @bind-Value="newUserItem.UserName"/>
+        </td>
+        <th></th>
+        <td class="form-group"> City: <br/>
+            <InputText @bind-Value="newUserItem.City"/>
+        </td>
+    </tr>
+    <tr>
+        <td class="form-group"> Birth year: <br/>
+            <InputNumber @bind-Value="newUserItem.BirthYear"/>
+        </td>
+        <th></th>
+        <td class="form-group"> Security level: <br/>
+            <InputNumber @bind-Value="newUserItem.SecurityLevel"/>
+        </td>
+    </tr>
+    <tr>
+        <td class="form-group"> Password: <br/>
+            <InputText @bind-Value="newUserItem.Password"/>
+        </td>
+    </tr>
+    <th></th>
+    <tr>
+        <p class="actions">
+            <button class="btn btn-outline-dark" type="submit">Add user</button>
+        </p>
+    </tr>
+    
+</EditForm>
+
+@code {
+    private User newUserItem = new User();
+    private User newUser = new User();
+
+    private void AddNewUser()
+    {
+        newUser.UserName = newUserItem.UserName;
+        newUser.Password = newUserItem.Password;
+        newUser.City = newUserItem.City;
+        newUser.BirthYear = newUserItem.BirthYear;
+        newUser.SecurityLevel = newUserItem.SecurityLevel;
+        UserData.AddUser(newUser);
+        NavigationManager.NavigateTo("/users");
+    }
+
+}

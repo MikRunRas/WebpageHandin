@@ -1,0 +1,9 @@
+﻿@page "/"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@using Models
+
+<AuthorizeView>
+<h1>Hello, @context.User.Identity.Name</h1>
+</AuthorizeView>
+
+<h1>Welcome to the adult webpage!</h1>

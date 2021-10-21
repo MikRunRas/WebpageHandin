@@ -1,0 +1,57 @@
+﻿@page "/Edit/{Id:int}"
+@using Models
+@using Data
+@using LoginExample.Data.Impl
+@inject IUserData UserData
+@inject NavigationManager NavMgr
+
+<h3>Edit user with ID: @Id</h3>
+
+@if (userToEdit == null)
+{
+    <em>User not found!</em>
+}
+else
+{
+    <EditForm Model="@userToEdit" OnValidSubmit="@Save">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <div class="form-group">
+            User Id:<br/>
+            <InputNumber @bind-Value="userToEdit.id"/>
+        </div>
+        <div class="form-group">
+            City:<br/>
+            <InputTextArea data-browse="4" @bind-Value="userToEdit.City"/>
+        </div>
+        <div class="form-group">
+            Security level:<br/>
+            <InputNumber data-browse="4" @bind-Value="userToEdit.SecurityLevel"/>
+        </div>
+        <div class="form-group">
+            User name:<br/>
+            <InputTextArea data-browse="4" @bind-Value="userToEdit.UserName"/>
+        </div>
+        <p class="actions">
+            <button class="btn btn-outline-dark" type="submit">Save</button>
+        </p>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private User userToEdit;
+
+    protected async override Task OnInitializedAsync()
+    {
+        userToEdit = UserData.Get(Id);
+    }
+
+    private void Save()
+    {
+        UserData.Update(userToEdit);
+        NavMgr.NavigateTo("/users");
+    }
+}

@@ -1,0 +1,89 @@
+﻿@page "/users"
+@using Models
+@using WebApplication.Data;
+@using Microsoft.AspNetCore.Mvc.Filters
+@using LoginExample.Data.Impl
+@inject IFamilyData FamilyData
+@inject IUserData UserData
+@inject NavigationManager NavMgr
+
+<h3>List of users</h3>
+
+@if (ListOfUsers == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+} else if (!ListOfUsers.Any())
+{
+    <p>
+        <em>No users exist. Please add some.</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Username</th>
+            <th>Birthyear</th>
+            <th>City</th>
+            <th>Security level</th>
+            <AuthorizeView Policy="SecurityLevel3">
+                <th>Delete</th>
+            </AuthorizeView>
+            <AuthorizeView Policy="SecurityLevel3">
+                <th>Edit</th>
+            </AuthorizeView>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in ListOfUsers)
+        {
+            <tr>
+                <td>@item.id</td>
+                <td>@item.UserName</td>
+                <td>@item.BirthYear</td>
+                <td>@item.City</td>
+                <td>@item.SecurityLevel</td>
+                <AuthorizeView Policy="SecurityLevel3">
+                    <button @onclick="@(() => RemoveAdult(item.id))">
+                        <i class="oi oi-trash" style="color:red"/>
+                    </button>
+                </AuthorizeView>
+                <AuthorizeView Policy="SecurityLevel3">
+                    <td>
+                        <button @onclick="@(() => Edit(item.id))">
+                            <i class="oi oi-pencil" style="color:#1b6ec2"/>
+                        </button>
+                    </td>
+                </AuthorizeView>
+                </tr>
+        }
+        </tbody>
+    </table>
+}
+@code {
+    private IList<User> ListOfUsers;
+    
+
+    private void Edit(int id)
+    {
+        NavMgr.NavigateTo($"Edit/{id}");
+    }
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListOfUsers = UserData.GetUsers();
+    }
+
+    private void RemoveAdult(int userId)
+    {
+        User userToRemove = ListOfUsers.First(t => t.id == userId);
+        UserData.RemoveUser(userId);
+        ListOfUsers.Remove(userToRemove);
+    }
+    
+}

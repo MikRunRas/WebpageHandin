@@ -1,0 +1,86 @@
+﻿@page "/AddAdults"
+@using Models
+@using WebApplication.Data
+
+@inject IFamilyData FamilyData
+@inject NavigationManager NavigationManager
+
+<h3>Add Adult</h3>
+
+<EditForm Model="@newAdultItem" OnValidSubmit="@AddNewAdult">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <tr>
+        <td class="form-group"> First Name: <br/>
+            <InputText @bind-Value="newAdultItem.FirstName"/>
+        </td>
+        <th></th>
+        <td class="form-group"> Last Name: <br/>
+            <InputText @bind-Value="newAdultItem.LastName"/>
+        </td>
+    </tr>
+    <tr>
+        <td class="form-group"> Hair color: <br/>
+            <InputText @bind-Value="newAdultItem.HairColor"/>
+        </td>
+        <th></th>
+        <td class="form-group"> Eye color: <br/>
+            <InputText @bind-Value="newAdultItem.EyeColor"/>
+        </td>
+    </tr>
+    <tr>
+        <td class="form-group"> Age: <br/>
+            <InputNumber @bind-Value="newAdultItem.Age"/>
+        </td>
+        <th></th>
+        <td class="form-group"> Weight: <br/>
+            <InputNumber @bind-Value="newAdultItem.Weight"/>
+        </td>
+    </tr>
+    <tr>
+        <td class="form-group"> Height: <br/>
+            <InputNumber @bind-Value="newAdultItem.Height"/>
+        </td>
+        <th></th>
+            <td class="form-group"> Sex: <br/>
+                <InputText @bind-Value="newAdultItem.Sex"/>
+            </td>
+    </tr>
+    <tr>
+        <td class="form-group"> Job title: <br/>
+            <InputText @bind-Value="newJobItem.JobTitle"/>
+        </td>
+        <th></th>
+            <td class="form-group"> Salary: <br/>
+                    <InputNumber @bind-Value="newJobItem.Salary"/>
+                </td>
+    </tr>
+    <tr>
+        <p class="actions">
+            <button class="btn btn-outline-dark" type="submit">Add adult</button>
+        </p>
+    </tr>
+    
+</EditForm>
+
+@code {
+    private Adult newAdultItem = new Adult();
+    private Job newJobItem = new Job();
+    private Adult newAdult = new Adult();
+
+    private void AddNewAdult()
+    {
+        newAdult.FirstName = newAdultItem.FirstName;
+        newAdult.LastName = newAdultItem.LastName;
+        newAdult.HairColor = newAdultItem.HairColor;
+        newAdult.EyeColor= newAdultItem.EyeColor;
+        newAdult.Age = newAdultItem.Age;
+        newAdult.Weight = newAdultItem.Weight;
+        newAdult.Height = newAdultItem.Height;
+        newAdult.Sex = newAdultItem.Sex;
+        newAdult.JobTitle = newJobItem;
+        FamilyData.AddAdult(newAdult);
+        NavigationManager.NavigateTo("/adults");
+    }
+
+}

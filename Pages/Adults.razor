@@ -1,0 +1,144 @@
+﻿@page "/adults"
+@using Models
+@using WebApplication.Data;
+@using Microsoft.AspNetCore.Mvc.Filters
+@inject IFamilyData FamilyData
+@inject NavigationManager NavMgr
+
+<h3>Adults list</h3>
+
+
+<p>
+    Filter by person ID: <input type="number" @oninput="@((arg) => FilterByAdultID(arg))" style="width:100px"/>
+    Filter by name: <input type="text" rows="1" @oninput="@((arg) => FilterByName(arg))" style="width:100px"/>
+    Filter by jobtitle: <input type="text" rows="1" @oninput="@((arg) => FilterByJob(arg))" style="width:100px"/>
+    Filter by sex: <input type="text" rows="1" @oninput="@((arg) => FilterBySex(arg))" style="width:100px"/>
+</p>
+@if (adultsToShow == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+} else if (!adultsToShow.Any())
+{
+    <p>
+        <em>No Adult items exist. Please add some.</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Person ID</th>
+            <th>Firstname</th>
+            <th>Lastname</th>
+            <th>Jobtitle</th>
+            <th>Age</th>
+            <th>Sex</th>
+            <AuthorizeView Policy="SecurityLevel2">
+                <th>Salary</th>
+                <th>Delete</th>
+            </AuthorizeView>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in adultsToShow)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.FirstName</td>
+                <td>@item.LastName</td>
+                <td>@item.JobTitle.JobTitle</td>
+                <td>@item.Age</td>
+                <td>@item.Sex</td>
+                    <AuthorizeView Policy="SecurityLevel2">
+                        <td>@item.JobTitle.Salary</td>
+                        <button @onclick="@(() => RemoveAdult(item.Id))">
+                            <i class="oi oi-trash" style="color:red"/>
+                        </button>
+                    </AuthorizeView>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IList<Adult> adultsToShow;
+    private IList<Adult> allAdults;
+
+    private int? filterById;
+    private string filterByName;
+    private string filterByJob;
+    private string filterBySex;
+
+    private void FilterBySex(ChangeEventArgs changeEventArgs)
+    {
+        filterBySex = null;
+        try
+        {
+            filterBySex = changeEventArgs.Value.ToString();
+        }catch (Exception e){}
+        ExecuteFilter();
+    }
+    private void FilterByAdultID(ChangeEventArgs changeEventArgs)
+    {
+        filterById = null;
+        try
+        {
+            filterById = int.Parse(changeEventArgs.Value.ToString());
+        }catch (Exception e){}
+        ExecuteFilter();
+    }
+
+    private void FilterByName(ChangeEventArgs args)
+    {
+        filterByName = null;
+        try
+        {
+            filterByName = args.Value.ToString();
+        }catch (Exception e){}
+        ExecuteFilter();
+    }
+    
+    private void FilterByJob(ChangeEventArgs changeEventArgs)
+    {
+        filterByJob = null;
+        try
+        {
+            filterByJob = changeEventArgs.Value.ToString();
+        }catch (Exception e){}
+        ExecuteFilter();
+    }
+
+    private void Edit(int id)
+    {
+        NavMgr.NavigateTo($"Edit/{id}");
+    }
+
+    private void ExecuteFilter()
+    {
+        Console.WriteLine(filterByName);
+        adultsToShow = allAdults.Where(t =>
+            (filterById != null && t.Id == filterById || filterById == null) &&
+            (filterByName != null && t.FirstName.Contains(filterByName) || filterByName == null) &&
+            (filterByJob != null && t.JobTitle.JobTitle.Contains(filterByJob) || filterByJob == null) &&
+            (filterBySex != null && t.Sex.Contains(filterBySex) || filterBySex == null)
+            ).ToList();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        allAdults = FamilyData.GetAdults();
+        adultsToShow = allAdults;
+    }
+
+    private void RemoveAdult(int adultId)
+    {
+        Adult adultToRemove = allAdults.First(t => t.Id == adultId);
+        FamilyData.RemoveAdult(adultId);
+        allAdults.Remove(adultToRemove);
+        adultsToShow.Remove(adultToRemove);
+    }
+}
